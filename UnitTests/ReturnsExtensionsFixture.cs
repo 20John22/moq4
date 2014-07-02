@@ -8,6 +8,12 @@ namespace Moq.Tests
     {
         public interface IAsyncInterface
         {
+            Task NoParametersReturnType();
+            
+            Task RefParameterReturnType(string value);
+            
+            Task ValueParameterReturnType(int value);
+            
             Task<string> NoParametersRefReturnType();
             
             Task<int> NoParametersValueReturnType();
@@ -20,7 +26,18 @@ namespace Moq.Tests
          
             Task<int> ValueParameterValueReturnType(int value);
         }
-
+        
+        [Fact]
+        public void ReturnsAsync_on_NoParametersReturnType()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.NoParametersReturnType()).ReturnsAsync();
+            
+            var task = mock.Object.NoParametersReturnType();
+            
+            Assert.True(task.IsCompleted);
+        }
+        
         [Fact]
         public void ReturnsAsync_on_NoParametersRefReturnType()
         {
@@ -46,6 +63,17 @@ namespace Moq.Tests
         }
 
         [Fact]
+        public void ReturnsAsync_on_RefParameterReturnType()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.RefParameterReturnType("Param1")).ReturnsAsync();
+            
+            var task = mock.Object.RefParameterReturnType("Param1");
+            
+            Assert.True(task.IsCompleted);
+        }
+		
+        [Fact]
         public void ReturnsAsync_on_RefParameterRefReturnType()
         {
             var mock = new Mock<IAsyncInterface>();
@@ -56,7 +84,7 @@ namespace Moq.Tests
             Assert.True(task.IsCompleted);
             Assert.Equal("TestString", task.Result);
         }
-
+		
         [Fact]
         public void ReturnsAsync_on_RefParameterValueReturnType()
         {
@@ -68,7 +96,18 @@ namespace Moq.Tests
             Assert.True(task.IsCompleted);
             Assert.Equal(36, task.Result);
         }
-
+        
+        [Fact]
+        public void ReturnsAsync_on_ValueParameterReturnType()
+        {
+            var mock = new Mock<IAsyncInterface>();
+            mock.Setup(x => x.ValueParameterReturnType(36)).ReturnsAsync();
+            
+            var task = mock.Object.ValueParameterReturnType(36);
+            
+            Assert.True(task.IsCompleted);
+        }
+        
         [Fact]
         public void ReturnsAsync_on_ValueParameterRefReturnType()
         {
@@ -92,7 +131,20 @@ namespace Moq.Tests
             Assert.True(task.IsCompleted);
             Assert.Equal(37, task.Result);
         }
-
+        
+		[Fact]
+		public void ThrowsAsync_on_NoParametersReturnType()
+		{
+		    var mock = new Mock<IAsyncInterface>();
+		    var exception = new InvalidOperationException();
+		    mock.Setup(x => x.NoParametersReturnType()).ThrowsAsync(exception);
+		    
+		    var task = mock.Object.NoParametersReturnType();
+		    
+		    Assert.True(task.IsFaulted);
+		    Assert.Equal(exception, task.Exception.InnerException);
+		}
+		
         [Fact]
         public void ThrowsAsync_on_NoParametersRefReturnType()
         {
@@ -119,6 +171,19 @@ namespace Moq.Tests
             Assert.Equal(exception, task.Exception.InnerException);
         }
 
+		[Fact]
+		public void ThrowsAsync_on_RefParameterReturnType()
+		{
+		    var mock = new Mock<IAsyncInterface>();
+		    var exception = new InvalidOperationException();
+		    mock.Setup(x => x.RefParameterReturnType("Param1")).ThrowsAsync(exception);
+		    
+		    var task = mock.Object.RefParameterReturnType("Param1");
+		    
+		    Assert.True(task.IsFaulted);
+		    Assert.Equal(exception, task.Exception.InnerException);
+		}
+		
         [Fact]
         public void ThrowsAsync_on_RefParameterRefReturnType()
         {
@@ -144,7 +209,20 @@ namespace Moq.Tests
             Assert.True(task.IsFaulted);
             Assert.Equal(exception, task.Exception.InnerException);
         }
-
+		
+		[Fact]
+		public void ThrowsAsync_on_ValueParameterReturnType()
+		{
+		    var mock = new Mock<IAsyncInterface>();
+		    var exception = new InvalidOperationException();
+		    mock.Setup(x => x.ValueParameterReturnType(36)).ThrowsAsync(exception);
+		    
+		    var task = mock.Object.ValueParameterReturnType(36);
+		    
+		    Assert.True(task.IsFaulted);
+		    Assert.Equal(exception, task.Exception.InnerException);
+		}
+		
         [Fact]
         public void ThrowsAsync_on_ValueParameterRefReturnType()
         {
